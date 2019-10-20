@@ -9,7 +9,7 @@ def generate(n, f):
     f.write(f'{n}\n')
     mask = binary(n)
     p = normal(20, 10, n)*mask + normal(35, 10, n)*(1-mask)
-    p = p.clip(0,60)
+    p = p.clip(3,60)
     p = p.astype(int)
     total = p.sum()/4
 
