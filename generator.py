@@ -20,8 +20,14 @@ def generate(n, f):
     r = r.astype(int)
 
     d = r + p + randint(10, 40)
+    min_r = r.min()
+    r -= min_r
+    d -= min_r
 
     assert (d-r > p).all() 
+    assert (p > 0).all()
+    assert (r >= 0).all()
+    assert (d >= 0).all()
     for pi, ri, di in zip(p, r, d):
         f.write(f'{pi} {ri} {di}\n')
 
