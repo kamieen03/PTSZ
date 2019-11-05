@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage[margin=1.0in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{polski}
+
+\title{Generator instancji}
+\author{Kamil Burdziński 132200}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{P - czas trwania}
+$p_i$ są generowane z rokładu normalnego o średniej 27 i odchyleniu standardowym 13. Zadania długości 1 i 2
+mogłyby się okazać zbyt proste do uszeregowania i niemal wcale nie wpływać na wartość tardiness, dlatego
+minimalne $p$ zostało ustalone na 3. Aby uniknąć mało prawdopodobnej sytuacji, w której niewielki podzbiór bardzo
+długich zadań decyduje o wartości tardiness, maksymalna wartość $p$ została ustalona na 60.
+
+\section{R - ready time}
+Po wygenerowaniu $p_i$, ich wartości są sumowane, dzielone przez $4$ i zapisywane w zmiennej $S$.
+Następnie generowana jest pięcioelementowa tablica wartości z rozkładu jednostajnego
+na przedziale $[5, \tfrac{4}{5}*S]$. Z tak utworzonej tablicy, dla zadania $i$,
+losowana jest liczba $m$. Wówczas wartość $r_i$ losowana jest z rozkładu normalnego 
+o średniej $m$ i odchyleniu standardowym $\tfrac{S}{100}$. Wartość ujemnych $r_i$ jest 
+ustawiana na $0$.
+\section{D - delay time}
+Wartość $d_i$ jest losowana z rozkładu jednostajnego na przedziale 
+$[p_i+r_i+10; p_i+r_i+40]$. \\
+
+Po wygenerowaniu parametrów, są one normalizowane tak, aby $min\{r_i\}=0$, przy niezmienionej
+długosci przedziałów $[r_i; r_i+d_i]$
+Dokładniej obliczna jest wartość $R = min\{r_i\}$ i wykonywane są podstawienia:
+$r_i = r_i - R$, $d_i = d_i - R$.
+
+
+
+\end{document}
+
