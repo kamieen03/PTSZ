@@ -2,13 +2,9 @@
 from numpy.random import normal, binomial, randint, choice
 import os
 
-def binary(n):
-    return binomial(1, 0.5, n)
-
 def generate(n, f):
     f.write(f'{n}\n')
-    mask = binary(n)
-    p = normal(20, 10, n)*mask + normal(35, 10, n)*(1-mask)
+    p = normal(27, 13, n)
     p = p.clip(3,60)
     p = p.astype(int)
     total = p.sum()/4
@@ -37,9 +33,9 @@ def main():
     except FileExistsError:
         pass
     for n in range(50, 501, 50):
-        f_name = f'instances/{n}.txt'
-        with open(f_name, 'w+') as f: 
-            generate(n, f)
+            f_name = f'instances/{n}.txt'
+            with open(f_name, 'w+') as f: 
+                generate(n, f)
 
 if __name__ == '__main__':
     main()
