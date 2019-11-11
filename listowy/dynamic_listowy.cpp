@@ -6,8 +6,8 @@
 #include <algorithm>
 #include <chrono>
 
-#include "Task.hpp"
-#include "utils.hpp"
+#include "../common/Task.hpp"
+#include "../common/utils.hpp"
 
 using namespace std;
 
