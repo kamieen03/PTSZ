@@ -13,6 +13,8 @@
 
 using namespace std;
 
+vector<double> W {1.0, 1.0, 1.0, 1.0};
+
 pair<int, int> choose_best_task(const vector<vector<int>> &criteria, const vector<Task> &tasks)
 {
     pair<int, int> best_task_cpu(-1, -1);
@@ -40,6 +42,10 @@ void compute_criteria(vector<vector<int>> &criteria, const vector<Task> &tasks, 
         for (int j = 0; j < 4; j++)
         {
 //            criteria[i][j] = max(times[j], tasks[i].r) + tasks[i].p - tasks[i].d;
+            criteria[i][j] = tasks[i].p * W[0] +
+                             tasks[i].r * W[1] +
+                             tasks[i].d * W[2] +
+                             times[j] * W[3];
         }
     }
 }
@@ -76,29 +82,37 @@ int main(int argc, char* argv[])
     const vector<string> idxs {"127147", "132189", "132190", "132193", "132200",
                          "132213", "132232", "132265", "132284", "132323", "132346"};
     //vector<pair<vector<double>, double>> best_weights;
+    for (auto &idx : idxs)
+        printf("%9s| ", idx.c_str()); 
+    cout << endl;
+    vector<long> avg[11];
 
-    for (int i = 0; i < 1; i++) {
-        //Task::weight = vector<double> {9.0,0.0,1.0,0.0};
-        Task::weight = Task::get_unit_vector(3);
+    for (int i = 0; i < 1000; i++) {
+        W = Task::get_unit_vector(4);
         vector<string> vps;
+        int k = 0;
         for(auto &idx : idxs)
         {
-            printf("%9s| ", idx.c_str()); 
             for (int n = 10; n<=10; n++)
             {
                 string sn = to_string(n*50);
                 auto tasks = read_instance("../instancje/inf"+idx+"/"+sn+".txt");
                 int penalty = schedule_dynamic(tasks);
                 vps.push_back(to_string(penalty));
+                avg[k].push_back((long)penalty);
             }
+            k++;
         }
-        cout << endl;
-        for (string & ps : vps)
-            printf("%9s| ", ps.c_str());
-        cout << endl;
+       // for (string & ps : vps)
+       //     printf("%9s| ", ps.c_str());
+       // cout << endl;
         //best_weights.push_back(make_pair(w, avg));
         //cout << i << " " << w[0]<<" "<<w[1]<<" "<<w[2]<<" "<<w[3]<<" " <<avg << endl;
     }
+    cout <<"averages" <<endl;
+    for (vector<long> v : avg)
+        printf("%9s| ", to_string((long)accumulate( v.begin(), v.end(), 0.0)/v.size()).c_str());
+    cout << endl;
 /*
     sort(best_weights.begin(), best_weights.end(), 
         [](const pair<vector<double>, double> &wa1, const pair<vector<double>, double> &wa2) -> bool
