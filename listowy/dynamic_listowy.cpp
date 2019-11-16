@@ -109,9 +109,9 @@ int main(int argc, char* argv[])
         //best_weights.push_back(make_pair(w, avg));
         //cout << i << " " << w[0]<<" "<<w[1]<<" "<<w[2]<<" "<<w[3]<<" " <<avg << endl;
     }
-    cout <<"averages" <<endl;
+    cout <<"minimums" <<endl;
     for (vector<long> v : avg)
-        printf("%9s| ", to_string((long)accumulate( v.begin(), v.end(), 0.0)/v.size()).c_str());
+        printf("%9s| ", to_string((long) *min_element(v.begin(), v.end())).c_str());
     cout << endl;
 /*
     sort(best_weights.begin(), best_weights.end(), 
