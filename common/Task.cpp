@@ -25,16 +25,16 @@ bool Task::static_cmp(const Task &a, const Task &b)
     return a.val < b.val;
 };
 
-int Task::dynamic_value(const int* cpu_times) const
+int Task::choose_processor(const int* cpu_times) const
 {
     int best_cpu = 0;
     double best_val = numeric_limits<double>::max();
     double temp_val;
     for (int i = 0; i < 4; i++) {
-        temp_val = (r - cpu_times[i]) * weight[0] +
-                   p * weight[1] + 
-                   d *  weight[2] + 
-                   (r-d) * weight[3];   //maximise the gap d-r
+        temp_val = p * weight[0] +
+                   (r - cpu_times[i]) * weight[1] + 
+                   (d - cpu_times[i]) * weight[2];
+        //temp_val = max(r, cpu_times[i]) + p;
         if (temp_val < best_val) {
             best_val = temp_val;
             best_cpu = i;
