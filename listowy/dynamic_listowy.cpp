@@ -14,6 +14,22 @@
 using namespace std;
 
 vector<double> W {1.0, 1.0, 1.0, 1.0};
+int MAXP;
+double HORIZON;
+
+void set_globals(const vector<Task> &tasks)
+{
+    MAXP = -1;
+    for (const auto & task: tasks)
+        if (task.p > MAXP)
+            MAXP = task.p;
+    double sum = 0;
+    for (const auto & task: tasks)
+        sum += task.p;
+    sum /= 4.0;
+    HORIZON = sum/tasks.size()*10;
+
+}
 
 pair<int, int> choose_best_task(const vector<vector<int>> &criteria, const vector<Task> &tasks)
 {
@@ -36,16 +52,31 @@ pair<int, int> choose_best_task(const vector<vector<int>> &criteria, const vecto
     return best_task_cpu;
 }
 
-void compute_criteria(vector<vector<int>> &criteria, const vector<Task> &tasks, const int times[4])
+void compute_criteria(vector<vector<int>> &criteria, const vector<Task> &tasks, const int t[4])
 {
+    vector<int> times(4, 1.0);
+    if (!(t[0] == t[1] == t[2] == t[3])){
+        times[0] = (double) t[0];
+        times[1] = (double) t[1];
+        times[2] = (double) t[2];
+        times[3] = (double) t[3];
+        double m = (double) *min_element(times.begin(), times.end());
+        for (auto &x : times)
+            x -= m;
+        double M = (double) *max_element(times.begin(), times.end());
+        for (auto &x : times)
+            x /= M;
+    }
     for (int i = 0; i < criteria.size(); i++) {
         for (int j = 0; j < 4; j++)
         {
-//            criteria[i][j] = max(times[j], tasks[i].r) + tasks[i].p - tasks[i].d;
-            criteria[i][j] = tasks[i].p * W[0] +
-                             tasks[i].r * W[1] +
-                             tasks[i].d * W[2] +
-                             times[j] * W[3];
+            criteria[i][j] = max(times[j], tasks[i].r) + tasks[i].p - tasks[i].d;
+            criteria[i][j] = 0.0;
+            criteria[i][j] += tasks[i].p * W[0];
+            criteria[i][j] += tasks[i].r * W[1];
+            criteria[i][j] += tasks[i].d * W[2];
+            criteria[i][j] += t[j] * W[3];
+            criteria[i][j] += (double) MAXP*(tasks[i].d - t[j])/tasks[i].p * W[4];
         }
     }
 }
@@ -85,10 +116,13 @@ int main(int argc, char* argv[])
     for (auto &idx : idxs)
         printf("%9s| ", idx.c_str()); 
     cout << endl;
-    vector<long> avg[11];
+    vector<double> avg[11];
+    vector<vector<double>> ws;
 
     for (int i = 0; i < 1000; i++) {
-        W = Task::get_unit_vector(4);
+        W = Task::get_unit_vector(5);
+        //W = vector<double> {0.15, 0.4, 0.3, 0.15};
+        ws.push_back(W);
         vector<string> vps;
         int k = 0;
         for(auto &idx : idxs)
@@ -97,33 +131,51 @@ int main(int argc, char* argv[])
             {
                 string sn = to_string(n*50);
                 auto tasks = read_instance("../instancje/inf"+idx+"/"+sn+".txt");
+                set_globals(tasks);
                 int penalty = schedule_dynamic(tasks);
                 vps.push_back(to_string(penalty));
-                avg[k].push_back((long)penalty);
+                avg[k++].push_back((double)penalty);
             }
-            k++;
         }
        // for (string & ps : vps)
        //     printf("%9s| ", ps.c_str());
        // cout << endl;
-        //best_weights.push_back(make_pair(w, avg));
-        //cout << i << " " << w[0]<<" "<<w[1]<<" "<<w[2]<<" "<<w[3]<<" " <<avg << endl;
     }
     cout <<"minimums" <<endl;
-    for (vector<long> v : avg)
+    for (const vector<double> &v : avg)
         printf("%9s| ", to_string((long) *min_element(v.begin(), v.end())).c_str());
     cout << endl;
-/*
-    sort(best_weights.begin(), best_weights.end(), 
-        [](const pair<vector<double>, double> &wa1, const pair<vector<double>, double> &wa2) -> bool
+
+    auto avg_copy = avg;
+    //for (vector<double> &v : avg)
+    //{
+    //    int m = *min_element(v.begin(), v.end());
+    //    for (auto &elem : v)
+    //        elem = elem-m+0.000001;
+    //    int M = *max_element(v.begin(), v.end());
+    //    for (auto &elem : v)
+    //        elem /= M;
+
+    //}
+    double best_val = 1.0;
+    int idx;
+    double temp;
+    for (int i = 0; i < 11; i++)
     {
-        return wa1.second < wa2.second;
-    });
-    for (auto &x : best_weights){
-        auto w = x.first;
-        cout << x.second << " | " <<  w[0]<<" "<<w[1]<<" "<<w[2]<<" "<<w[3] << endl;
+        best_val = INT_MAX;
+        idx = -1;
+        for (int j = 0; j < ws.size(); j++)
+        {
+            if (avg_copy[i][j] < best_val){
+                best_val = avg[i][j];
+                idx = j;
+            }
+        }
+        auto w = ws[idx];
+        cout << avg_copy[i][idx] << " " <<idx<<" " ;
+    //    cout <<  w[0]<<" "<<w[1]<<" "<<w[2]<<" "<<w[3]<< endl;
     }
-    */
+
     return 0;
 }
 
