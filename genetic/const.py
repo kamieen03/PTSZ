@@ -1,5 +1,4 @@
-POPULATION = 20
+POPULATION = 10
 MAX_TIME = 5
-MUT = 0.75 # percent of population to mutate each iteration
-RADIUS = 10
+MUT = 1.0 # percent of population to mutate each iteration
 

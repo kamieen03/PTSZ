@@ -11,13 +11,17 @@ from Solution import Solution
 from population import Population 
 
 START_TIME = -1
+RADIUS = -1
 
-def get_maxp(tasks):
+def get_max(tasks):
     maxp = 0
+    maxr = 0
     for t in tasks:
         if t.p > maxp:
             maxp = t.p
-    return maxp
+        if t.r > maxr:
+            maxr = t.r
+    return maxp, maxr
 
 def read_file(file_name):
     tasks = []
@@ -30,8 +34,8 @@ def read_file(file_name):
 
 
 def initialize(tasks):
-    MAXP = get_maxp(tasks)
-    solutions = [schedule(tasks, MAXP) for _ in range(POPULATION)]
+    MAXP, MAXR = get_max(tasks)
+    solutions = [schedule(tasks, MAXP, MAXR) for _ in range(POPULATION)]
     return Population(solutions)
 
 
@@ -72,22 +76,31 @@ def mutate(population):
 
 
 def execute_algorithm(tasks):
+    global RADIUS
     population = initialize(tasks)
     best_solution = copy.deepcopy(population[0])
     print(best_solution.val)
 
-    while time() - START_TIME < MAX_TIME:
+    while True:
+        used = time() - START_TIME 
+        RADIUS = ((MAX_TIME-used)*6 + 2*used) / MAX_TIME
+        RADIUS = int(RADIUS)
+        if used > MAX_TIME - 0.1:
+            break
         mutated = mutate(population)
         population.update(mutated)
         if population[0] < best_solution:
             best_solution = copy.deepcopy(population[0])
             print(best_solution.val)
+            if best_solution.val == 0:
+                break
+    print(best_solution)
 
 
 def main():
     global START_TIME
     START_TIME = time()
-    tasks = read_file('instancje/inf132200/500.txt')
+    tasks = read_file('instancje/inf132190/500.txt')
     Solution.tasks = tasks
     execute_algorithm(tasks)
     

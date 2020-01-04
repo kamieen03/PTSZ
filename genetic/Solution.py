@@ -3,21 +3,27 @@ import numpy as np
 class Solution:
     tasks = None
 
-    def __init__(self, solution, val = -1):
+    def __init__(self, solution, val = -1, W=0, P=0, R=0):
         self.sol = solution
         if val == -1:
             val = self._get_val(solution)
         self.val = val
+        self.W = W
+        self.P = P
+        self.R = R
 
     def __cmp__(self, other):
         return cmp(self.val, other.val)
+
+    def __len__(self):
+        return len(self.sol)
 
     def __lt__(self, other):
         return self.val < other.val
 
     def __le__(self, other):
         return self.val <= other.val
-
+    
     def __repr__(self):
         return str(self.sol[0]) + '\n' + \
                str(self.sol[1]) + '\n' + \

@@ -8,6 +8,9 @@ class Population:
         self.array = sorted(solutions)
         self.size = len(self.array)
 
+    def __len__(self):
+        return len(self.array)
+
     def update(self, solutions):
         solutions = sorted(solutions)
         start_idx = bisect.bisect_left(self.array, solutions[0])
@@ -18,11 +21,10 @@ class Population:
             return
 
         sol_idx = 0
-        new_arr_idx = arr_idx
         new_arr = self.array[:arr_idx]
 
         while len(new_arr) < self.size:
-            if solutions[sol_idx] <= self.array[arr_idx]:
+            if sol_idx < len(solutions) and solutions[sol_idx] <= self.array[arr_idx]:
                 new_arr.append(solutions[sol_idx])
                 sol_idx += 1
             else:
